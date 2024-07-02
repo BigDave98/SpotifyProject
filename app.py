@@ -4,12 +4,11 @@ from flask import Flask, url_for, session, request, redirect
 import json
 import time
 import pandas as pd
-from downloadvideos import DownloadVideosFromTitles
 
 app = Flask(__name__)
 
 app.secret_key = 'a1b2d3e4c5f6'
-app.config['SESSION_COOKIE_NAME'] = 'Davis Cookie'
+app.config['SESSION_COOKIE_NAME'] = 'spotify-login'
 TOKEN_INFO = "token_info"
 
 @app.route('/')
@@ -29,6 +28,7 @@ def authorize():
 
 @app.route('/logout')
 def logout():
+    #LogOut from the app
     for key in list(session.keys()):
         session.pop(key)
     return redirect('/')
@@ -57,28 +57,28 @@ def get_all_tracks():
     df.to_csv('songs.csv', index=False)
     return "done"
 
-    sp = spotipy.Spotify(auth=token_info['access_token'])
-    all_songs = []
-    iter = 0
-    while True:
-        items = sp.current_user_saved_tracks(limit=50, offset= iter * 50)['items']
-        iter += 1
-        all_songs += items
-        if len(items) < 50:
-            break
 
-    return str(all_songs)
-
+# Checks to see if token is valid and gets a new token if not
 def get_token():
-    token_info = session.get(TOKEN_INFO, None)
-    if not token_info:
-        raise "exception"
+    token_valid = False
+    token_info = session.get(TOKEN_INFO, {})
+
+    #Check if the session already have a token
+    if not (session.get('token_info', False)):
+        token_valid = False
+        return token_info, token_valid
+
+    #Check if the token has expired
     now = int(time.time())
-    is_expired = token_info['expires_at'] - now < 60
+    is_expired = session.get('token_info').get('expires_at') - now < 60
+
+    #Refresh token if it has expired
     if is_expired:
         sp_oauth = create_spotfy_oauth()
-        token_info = sp_oauth.refresh_access_token(token_info['refresh_token'])
-    return token_info
+        token_info = sp_oauth.refresh_access_token(session.get('token_info').get('expires_at'))
+
+        token_valid = True
+    return token_info, token_valid
 
 def create_spotfy_oauth():
     return SpotifyOAuth(
