@@ -1,10 +1,80 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liked Songs</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-$END$
+    <h1>Liked Songs</h1>
+
+    <input type="text" id="search" placeholder="Search by Music name or Author">
+
+    <table>
+        <thead>
+            <tr>
+                <th>Music name - Author</th>
+            </tr>
+        </thead>
+        <tbody id="music-list">
+            <!-- Músicas serão adicionadas aqui via JavaScript -->
+        </tbody>
+    </table>
+
+    <div class="pagination">
+        <button id="prev-btn" onclick="prevPage()">Previous</button>
+        <span id="page-info"></span>
+        <button id="next-btn" onclick="nextPage()">Next</button>
+    </div>
+
+    <script>
+        const songs = {{ songs | tojson | safe }};
+
+        const itemsPerPage = 50;
+        let currentPage = 1;
+        let filteredSongs = songs;
+
+        function displaySongs() {
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const songsToDisplay = filteredSongs.slice(start, end);
+
+            const musicList = document.getElementById("music-list");
+            musicList.innerHTML = "";
+
+            songsToDisplay.forEach(song => {
+                const row = document.createElement("tr");
+                const cell = document.createElement("td");
+                cell.textContent = song;
+                row.appendChild(cell);
+                musicList.appendChild(row);
+            });
+
+            document.getElementById("page-info").textContent = `Página ${currentPage} de ${Math.ceil(filteredSongs.length / itemsPerPage)}`;
+            document.getElementById("prev-btn").disabled = currentPage === 1;
+            document.getElementById("next-btn").disabled = currentPage === Math.ceil(filteredSongs.length / itemsPerPage);
+        }
+
+        function nextPage() {
+            currentPage++;
+            displaySongs();
+        }
+
+        function prevPage() {
+            currentPage--;
+            displaySongs();
+        }
+
+        document.getElementById("search").addEventListener("input", (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            filteredSongs = songs.filter(song => song.toLowerCase().includes(searchTerm));
+            currentPage = 1;
+            displaySongs();
+        });
+
+        // Exibe as músicas ao carregar a página
+        displaySongs();
+    </script>
 </body>
 </html>
