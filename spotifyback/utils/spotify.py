@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import spotipy
 from flask import url_for, session
 from spotipy.oauth2 import SpotifyOAuth
@@ -15,20 +16,23 @@ def create_spotify_oauth():
     )
 
 # Checks to see if token is valid and gets a new token if not
-def get_token(TOKEN_INFO):
+def get_token(session):
     token_valid = False
-    token_info = session.get(TOKEN_INFO, {})
+    token_info = session.get("token_info", {})
     if not (session.get('token_info', False)):
         token_valid = False
+        return token_info, token_valid
+
     now = int(time.time())
-    is_expired = token_info['expires_at'] - now < 60
+    is_expired = session.get('token_info').get('expires_at') - now < 60
     if is_expired:
         sp_oauth = create_spotify_oauth()
-        token_info = sp_oauth.refresh_access_token(token_info['refresh_token'])
-    return token_info
+        token_info = sp_oauth.refresh_access_token(session.get('token_info').get('refresh_token'))
 
-def get_tracks(session):
-    sp = spotipy.Spotify(auth=session.get('token_info').get('access_token'))
+    token_valid = True
+    return token_info, token_valid
+
+def get_tracks(sp):
     results = []
     iter = 0
 
@@ -42,14 +46,13 @@ def get_tracks(session):
             results += [val]
         if (len(curGroup) < 50):
             break
-    save_songs_csv(results)
+    #save_songs_csv(results, "Data/songs.csv")
     return results
 
-def save_songs_csv(list):
-    path = "Data/songs.csv"
+def save_songs_csv(list, path):
     try:
         with open(path, mode='w', newline='', encoding='utf-8') as csv_file:
-            reader, writer = csv.reader(csv_file), csv.writer(csv_file)
+            writer = csv.writer(csv_file)
             #songs = {line[0] for line in reader if line}
 
             if os.path.getsize(path) == 0:
