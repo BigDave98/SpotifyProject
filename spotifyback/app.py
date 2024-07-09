@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
-from flask import Flask, render_template, redirect, request, jsonify, make_response
+from flask import Flask, render_template, redirect, request, jsonify, make_response, session, url_for
 from utils.spotify import *
+import spotipy
+
+import os
 
 
 app = Flask(__name__)
@@ -21,7 +24,7 @@ def authorize():
     code = request.args.get('code')
     token_info = sp_oauth.get_access_token(code)
     session[TOKEN_INFO] = token_info
-    return redirect(url_for('get_all_tracks', _external = True)) #redirect(url_for('index'))
+    return redirect(url_for('get_all_tracks', _external=True))  # redirect(url_for('index'))
 
 @app.route('/logout')
 def logout():
@@ -33,28 +36,35 @@ def logout():
 def index():
     return render_template('index.html')
 
-@app.route('/get_all_tracks', methods = ['GET'])
+@app.route('/get_all_tracks')
 def get_all_tracks():
     session['token_info'], authorized = get_token(session)
     session.modified = True
     if not authorized:
         return redirect('/')
+
     sp = spotipy.Spotify(auth=session.get('token_info').get('access_token'))
-    results = make_response(
-        jsonify(
-            get_tracks(sp)
-        )
-    )
-    return results
+
+    path = 'Data\songs.csv'
+    all_tracks = tracks(path, sp)
+
+    search_query = request.args.get('search', '', type=str)
+
+    # Aplicar filtro se houver um termo de pesquisa
+    if search_query:
+        all_tracks = [track for track in all_tracks if search_query in track]
+        print(all_tracks)
+
+    return pagination(all_tracks)
 
 @app.route('/submit_selected_songs', methods=['POST'])
 def submit_selected_songs():
-    selected_songs = request.json
+    selected_songs = request.json.get('selectedSongs', [])
+
     path = "Data/selected_songs.csv"
     save_songs_csv(selected_songs, path)
-    # Aqui você pode processar os itens selecionados como desejado
-    print("Selected Songs:", selected_songs)
-    return jsonify({'message': 'Selected songs received'}), 200
+    print('Selected songs received')
+
 
 if __name__ == '__main__':
     app.run()
