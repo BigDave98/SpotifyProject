@@ -2,9 +2,7 @@
 from flask import Flask, render_template, redirect, request, jsonify, make_response, session, url_for
 from utils.spotify import *
 import spotipy
-
-import os
-
+from utils.DownloadVideos import *
 
 app = Flask(__name__)
 app.secret_key = 'a1b2d3e4c5f6'
@@ -63,7 +61,7 @@ def submit_selected_songs():
 
     path = "Data/selected_songs.csv"
     save_songs_csv(selected_songs, path)
-    print('Selected songs received')
+    return video_dowload(selected_songs)
 
 
 if __name__ == '__main__':

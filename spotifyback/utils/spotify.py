@@ -45,6 +45,7 @@ def get_tracks(sp, path):
             results += [val]
         if (len(curGroup) < 50):
             break
+
     save_songs_csv(results, path)
     return results
 
@@ -86,7 +87,9 @@ def pagination(all_tracks):
 def tracks(path, sp):
     if not os.path.exists(path) or os.stat(path).st_size == 0:
         tracks = get_tracks(sp, path)
+        return tracks
     else:
         tracks = []
         tracks = read_csv(tracks, path)
-    return tracks
+        return tracks
+
