@@ -8,8 +8,8 @@ import os
 
 def create_spotify_oauth():
     return SpotifyOAuth(
-        client_id='07ea87a0e0c34aa28f6550d4d2f612dc',
-        client_secret='04bfced91d2349d49d0d840660ccb0ba',
+        client_id=os.getenv("CLIENT_ID"),
+        client_secret=os.getenv("CLIENT_SECRET"),
         redirect_uri=url_for('authorize', _external = True),
         scope="user-library-read"
     )

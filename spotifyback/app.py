@@ -2,7 +2,7 @@
 import spotipy
 from flask import Flask, render_template, redirect, session
 from utils.spotify import *
-from utils.DownloadVideos import *
+from utils.downloadVideos import *
 from dotenv import load_dotenv
 
 load_dotenv()
