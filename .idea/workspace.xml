@@ -5,13 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="12343db1-5efd-48f4-a306-f90d0aec0185" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/spotifyback/utils/API.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/spotifyback/.cache" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/spotifyback/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/spotifyback/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/spotifyback/utils/spotify.py" beforeDir="false" afterPath="$PROJECT_DIR$/spotifyback/utils/spotify.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
